@@ -8,6 +8,12 @@
     "start": "next start",
     "lint": "eslint"
   },
+
+  "engines": {
+    "node": "20.x"
+  },
+
+
   "dependencies": {
     "@auth/mongodb-adapter": "^3.11.1",
     "bcryptjs": "^3.0.3",
