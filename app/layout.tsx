@@ -1,19 +1,28 @@
-import './globals.css'
-import Nav from '../components/Nav'
-import Providers from './providers'
-import type { ReactNode } from 'react'
+// app/layout.tsx
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { AuthProvider } from '@/context/AuthContext';
 
-export const metadata = { title: 'NextAuth Mongo Demo' }
+const inter = Inter({ subsets: ['latin'] });
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export const metadata: Metadata = {
+  title: 'Auth App - Login & Register',
+  description: 'Modern authentication app with Next.js and TypeScript',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
-      <body>
-        <Providers>
-          <Nav />
-          <main className="max-w-4xl mx-auto p-6">{children}</main>
-        </Providers>
+      <body className={inter.className}>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
-  )
+  );
 }

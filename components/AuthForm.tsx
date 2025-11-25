@@ -1,9 +1,6 @@
-"use client";
+'use client';
 
 import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
-import Link from "next/link";
 
 interface AuthFormProps {
   action?: string;
@@ -12,17 +9,18 @@ interface AuthFormProps {
 
 export default function AuthForm({
   action = "/api/register",
-  submitLabel = "Create Account",
+  submitLabel = "Submit",
 }: AuthFormProps) {
-  const router = useRouter();
-
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
+  const [error, setError] = useState<string>("");
+  const [ok, setOk] = useState<string>("");
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
-    const loadingToast = toast.loading("Processing...");
+    setError("");
+    setOk("");
 
     try {
       const res = await fetch(action, {
@@ -37,61 +35,51 @@ export default function AuthForm({
         throw new Error(data.message || "Failed");
       }
 
-      toast.success("Success!", { id: loadingToast });
-
-      router.push("/dashboard");
+      setOk("Success!");
     } catch (err: unknown) {
-      toast.error(
-        err instanceof Error ? err.message : "Something went wrong",
-        { id: loadingToast }
-      );
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong");
+      }
     }
   }
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-white px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-sm space-y-6 text-center"
-      >
-        <h2 className="text-2xl font-semibold">Create Account</h2>
+    <form
+      onSubmit={handleSubmit}
+      className="w-full max-w-md bg-white p-6 rounded-xl shadow"
+    >
+      <h2 className="text-lg font-medium mb-4">{submitLabel}</h2>
 
-        {/* Email */}
-        <div className="flex flex-col space-y-1 text-left">
-          <input
-            required
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black text-sm"
-          />
-        </div>
+      {error && <div className="text-sm text-red-600 mb-2">{error}</div>}
+      {ok && <div className="text-sm text-green-600 mb-2">{ok}</div>}
 
-        {/* Password */}
-        <div className="flex flex-col space-y-1 text-left">
-          <input
-            required
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black text-sm"
-          />
-        </div>
+      <label className="block mb-2">
+        <div className="text-sm mb-1">Email</div>
+        <input
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full px-3 py-2 border rounded"
+          type="email"
+        />
+      </label>
 
-        {/* Submit */}
-        <button
-          className="w-full py-3 rounded-xl bg-yellow-400 font-medium hover:bg-yellow-500 transition text-sm"
-        >
-          Sign Up
-        </button>
+      <label className="block mb-4">
+        <div className="text-sm mb-1">Password</div>
+        <input
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full px-3 py-2 border rounded"
+          type="password"
+        />
+      </label>
 
-        <p className="text-xs text-gray-500 mt-4">
-          Already Have an Account?{" "}
-          <Link className="text-blue-600 underline cursor-pointer" href="/login">Log In</Link>
-        </p>
-      </form>
-    </div>
+      <button className="w-full py-2 rounded bg-indigo-600 text-white">
+        {submitLabel}
+      </button>
+    </form>
   );
 }
